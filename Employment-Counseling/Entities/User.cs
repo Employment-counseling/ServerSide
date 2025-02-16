@@ -4,25 +4,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EmploymentCounseling.Entities
+namespace Employment_Counseling.Entities
 {
-  
-	enum Payment
+
+    public enum Payment
 	{
 		NotPaid=1,
 		PartiallyPaid = 2,
         Paid = 3
 	}
-	internal class Client
-	{
+    public class User
+    {
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Password { get; set; }
         public string EmailAddress { get; set; }
         public string PhoneNumber { get; set; } = string.Empty;
-        public Package Package { get; set; }
-        public Payment IsPaid { get; set; }
-        public bool IsAnswered {get; set; }
 
+        // קישור לחבילה
+        public Guid PackageId { get; set; }
+        public Package Package { get; set; }
+
+        // סטטוס תשלום
+        public Payment IsPaid { get; set; }
+
+        // האם השלים את השאלונים
+        public bool IsAnswered { get; set; }
+
+        // קישור לתשובות המשתמש
+        public List<UserAnswer> UserAnswers { get; set; } = new();
     }
+
 }
