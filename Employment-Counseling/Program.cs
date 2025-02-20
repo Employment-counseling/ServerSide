@@ -1,34 +1,42 @@
 using Employment_Counseling.Data;
+using Employment_Counseling.Repositories;
+using Employment_Counseling.Repositories.Interfaces;
+using Employment_Counseling.Services;
+using Employment_Counseling.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlOptions => sqlOptions.EnableRetryOnFailure())
-);
+        sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
-// Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddControllers();
+
+// רישום התלויות (Dependency Injection)
+builder.Services.AddScoped<IPackageRepository, PackageRepository>();
+builder.Services.AddScoped<IPackageService, PackageService>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseRouting();
-
+app.UseCors("AllowAll");
 app.UseAuthorization();
 
-app.MapStaticAssets();
-app.MapRazorPages()
-   .WithStaticAssets();
-
+app.MapControllers();
 app.Run();
