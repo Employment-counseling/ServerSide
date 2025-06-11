@@ -8,46 +8,64 @@ namespace Employment_Counseling.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Costumer> Costumers { get; set; }
+        public DbSet<Counselor> Counselors { get; set; }
         public DbSet<Package> Packages { get; set; }
+        public DbSet<QuestionItem> QuestionItems { get; set; }
         public DbSet<Questionnaire> Questionnaires { get; set; }
-        public DbSet<PackageQuestionnaire> PackageQuestionnaires { get; set; }
-        public DbSet<UserAnswer> UserAnswers { get; set; }
+        public DbSet<AnswerItem> AnswerItems { get; set; }
+        public DbSet<UserAnswers> UserAnswers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // קשר Many-to-Many בין חבילות לשאלונים
-            modelBuilder.Entity<PackageQuestionnaire>()
-                .HasKey(pq => new { pq.PackageId, pq.QuestionnaireId });
+            modelBuilder.Entity<User>().ToTable("Users");
+            modelBuilder.Entity<Costumer>().ToTable("Costumers");
+            modelBuilder.Entity<Counselor>().ToTable("Counselors");
 
-            modelBuilder.Entity<PackageQuestionnaire>()
-                .HasOne(pq => pq.Package)
-                .WithMany(p => p.PackageQuestionnaires)
-                .HasForeignKey(pq => pq.PackageId);
+            modelBuilder.Entity<QuestionItem>()
+                .HasOne(q => q.Questionnaire)
+                .WithMany(q => q.Questions)
+                .HasForeignKey(q => q.QuestionnaireId);
 
-            modelBuilder.Entity<PackageQuestionnaire>()
-                .HasOne(pq => pq.Questionnaire)
+            modelBuilder.Entity<AnswerItem>()
+                .HasOne(a => a.UserAnswers)
+                .WithMany(ua => ua.Answers)
+                .HasForeignKey(a => a.UserAnswersId);
+
+            modelBuilder.Entity<AnswerItem>()
+                .HasOne(a => a.Question)
                 .WithMany()
-                .HasForeignKey(pq => pq.QuestionnaireId);
+                .HasForeignKey(a => a.QuestionId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            modelBuilder.Entity<UserAnswers>()
+              .HasOne(ua => ua.Questionnaire)
+              .WithMany()
+              .HasForeignKey(ua => ua.QuestionnaireId)
+              .OnDelete(DeleteBehavior.Restrict);
 
-            // קשר User -> Package
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.Package)
-                .WithMany(p => p.Users)
-                .HasForeignKey(u => u.PackageId)
+            modelBuilder.Entity<UserAnswers>()
+               .HasOne(ua => ua.Costumer)
+               .WithMany(c => c.UserAnswers)
+               .HasForeignKey(ua => ua.CostumerId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Costumer>()
+                .HasOne(c => c.Package)
+                .WithMany()
+                .HasForeignKey(c => c.PackageId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // קשר User -> UserAnswer -> Questionnaire
-            modelBuilder.Entity<UserAnswer>()
-                .HasOne(ua => ua.User)
-                .WithMany(u => u.UserAnswers)
-                .HasForeignKey(ua => ua.UserId);
+            modelBuilder.Entity<Package>()
+                .HasMany(p => p.Questionnaires)
+                .WithMany(q => q.Packages);
 
-            modelBuilder.Entity<UserAnswer>()
-                .HasOne(ua => ua.Questionnaire)
-                .WithMany()
-                .HasForeignKey(ua => ua.QuestionnaireId);
+            modelBuilder.Entity<Counselor>()
+                .HasMany(c => c.Packages)
+                .WithMany(p => p.Counselors);
+
         }
     }
 }
