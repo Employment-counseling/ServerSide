@@ -1,4 +1,5 @@
 using Employment_Counseling.Data;
+using Employment_Counseling.DTOs;
 using Employment_Counseling.Repositories;
 using Employment_Counseling.Repositories.Interfaces;
 using Employment_Counseling.Services;
@@ -10,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
         sqlOptions => sqlOptions.EnableRetryOnFailure()));
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddControllers();
 

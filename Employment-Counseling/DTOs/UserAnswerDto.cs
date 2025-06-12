@@ -1,8 +1,12 @@
 ﻿namespace Employment_Counseling.DTOs
 {
-    public class UserAnswerDto
+    public class UserAnswersDto
     {
+        public Guid Id { get; set; }
+        public Guid CostumerId { get; set; }
         public Guid QuestionnaireId { get; set; }
-        public string AnswersJson { get; set; } // תשובות בפורמט JSON
+        public DateTime DateSubmitted { get; set; }
+        public List<AnswerItemDto> Answers { get; set; }
     }
+
 }
