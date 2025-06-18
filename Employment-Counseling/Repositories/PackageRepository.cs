@@ -18,5 +18,11 @@ namespace Employment_Counseling.Repositories
         {
             return await _context.Packages.ToListAsync();
         }
+
+
+        public async Task<Package> GetPackageByIdAsync(Guid packageId)
+        {
+            return await _context.Packages.FirstOrDefaultAsync(p => p.Id == packageId);
+        }
     }
 }
