@@ -7,5 +7,6 @@ namespace Employment_Counseling.Repositories.Interfaces
         Task<IEnumerable<User>> GetAllUsers();
         Task<User> GetUserById(Guid id);
         Task<User> GetUserByEmailAddress(string email);
+        Task<bool> UpdateUserDetails(User user);
     }
 }

@@ -42,6 +42,15 @@ namespace Employment_Counseling.Controllers
                 : NotFound(ApiResponse<LoginResult>.Fail(loginResult.ErrorMessage?? "Login Faild"));
            
         }
+
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> UpdateUserDetails(Guid id, [FromBody] UpdateUserDto userDetails)
+        {
+            var update = _userService.UpdateUserDetails(id, userDetails).Result;
+            return update
+                ? Ok(ApiResponse<string>.Ok("","User updated successfully"))
+                : NotFound(ApiResponse<string>.Fail("User not found"));
+        }
     }
 }
 

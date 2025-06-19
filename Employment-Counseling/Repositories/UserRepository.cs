@@ -29,5 +29,12 @@ namespace Employment_Counseling.Repositories
             return await _context.Users.FirstOrDefaultAsync(u => u.EmailAddress
                                 .Equals(email, StringComparison.OrdinalIgnoreCase));
         }
+
+        public async Task<bool> UpdateUserDetails(User user)
+        {
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

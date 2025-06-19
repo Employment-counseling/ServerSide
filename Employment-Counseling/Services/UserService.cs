@@ -34,9 +34,9 @@ namespace Employment_Counseling.Services
         {
             var user = await _userRepository.GetUserByEmailAddress(email);
             if (user == null)
-                return LoginResult.Fail("המשתמש לא נמצא");
+                return LoginResult.Fail("User Not Found");
             if (!user.Password.Equals(password))
-                return LoginResult.Fail("הססמה שגויה");
+                return LoginResult.Fail("Password Is Incorrect");
             object userDto = user switch
             {
                 Costumer c => _mapper.Map<CostumerDto>(c),
@@ -45,6 +45,14 @@ namespace Employment_Counseling.Services
             };
             return LoginResult.Ok(userDto, user.IsCostumer);
         }
-       
+        public async Task<bool> UpdateUserDetails(Guid id, UpdateUserDto dto)
+        {
+            var user = _userRepository.GetUserById(id).Result;
+            if (user == null) return false;
+            user.Name = dto.Name ?? user.Name;
+            user.PhoneNumber = dto.PhoneNumber ?? user.PhoneNumber;
+            user.EmailAddress = dto.EmailAddress ?? user.EmailAddress;
+            return await _userRepository.UpdateUserDetails(user);
+        }
     }
 }
