@@ -1,0 +1,11 @@
+﻿using Employment_Counseling.DTOs;
+
+namespace Employment_Counseling.Services.Interfaces
+{
+    public interface IUserService
+    {
+        Task<IEnumerable<UserDto>> GetAllUsers();
+        Task<UserDto> GetUserById(Guid userId);
+        Task<LoginResult> Login(string email, string password);
+    }
+}

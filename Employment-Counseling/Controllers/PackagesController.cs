@@ -19,7 +19,7 @@ namespace Employment_Counseling.Controllers
         public async Task<ActionResult<ApiResponse<IEnumerable<PackageDto>>>> GetPackages()
         {
             var packages = await _packageService.GetAllPackagesAsync();
-            return packages == null || packages.Any()
+            return packages == null || !packages.Any()
                 ? NotFound(ApiResponse<IEnumerable<PackageDto>>.Fail("Packages not found"))
                 :Ok(ApiResponse<IEnumerable<PackageDto>>.Ok(packages));
         }
