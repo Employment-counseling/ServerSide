@@ -51,6 +51,17 @@ namespace Employment_Counseling.Controllers
                 ? Ok(ApiResponse<string>.Ok("","User updated successfully"))
                 : NotFound(ApiResponse<string>.Fail("User not found"));
         }
+
+        [HttpPost("change-password")]
+        public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+        {
+            var result = await _userService.ChangePassword(dto);
+
+            if (!result.Success)
+                return BadRequest(ApiResponse<string>.Fail(result.ErrorMessage));
+
+            return Ok(ApiResponse<string>.Ok("","Password changed successfully"));
+        }
     }
 }
 

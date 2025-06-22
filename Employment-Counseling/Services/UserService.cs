@@ -54,5 +54,20 @@ namespace Employment_Counseling.Services
             user.EmailAddress = dto.EmailAddress ?? user.EmailAddress;
             return await _userRepository.UpdateUserDetails(user);
         }
+
+        public async Task<(bool Success, string ErrorMessage)> ChangePassword(ChangePasswordDto dto)
+        {
+            var user = await _userRepository.GetUserById(dto.UserId);
+            if (user == null)
+                return (false, "User not found");
+
+            //TODO: Add hash code
+            if (user.Password != dto.CurrentPassword) 
+                return (false, "Current password is incorrect");
+
+            user.Password = dto.NewPassword;
+            await _userRepository.UpdateUserDetails(user);
+            return (true, null);
+        }
     }
 }
