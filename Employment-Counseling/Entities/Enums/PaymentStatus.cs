@@ -4,6 +4,7 @@
     {
         NotPaid = 1,
         PartiallyPaid = 2,
-        Paid = 3
+        Paid = 3, 
+        InValid = 4
     }
 }

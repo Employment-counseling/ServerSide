@@ -23,6 +23,9 @@ builder.Services.AddScoped<IQuestionnaireRepository, QuestionnaireRepository>();
 builder.Services.AddScoped<IQuestionnaireService, QuestionnaireService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICostumerRepository, CostumerRepository>();
+builder.Services.AddScoped<ICostumerService, CostumerService>();
+builder.Services.AddScoped<IPayPalService, PayPalService>();
 
 builder.Services.AddCors(options =>
 {
