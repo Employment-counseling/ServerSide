@@ -15,6 +15,7 @@ namespace Employment_Counseling.Data
         public DbSet<Questionnaire> Questionnaires { get; set; }
         public DbSet<AnswerItem> AnswerItems { get; set; }
         public DbSet<UserAnswers> UserAnswers { get; set; }
+        public DbSet<AuthToken> UsersTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -65,6 +66,16 @@ namespace Employment_Counseling.Data
             modelBuilder.Entity<Counselor>()
                 .HasMany(c => c.Packages)
                 .WithMany(p => p.Counselors);
+
+            modelBuilder.Entity<AuthToken>()
+                .HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AuthToken>()
+                .HasIndex(t => t.Token)
+                .IsUnique();
 
         }
     }
