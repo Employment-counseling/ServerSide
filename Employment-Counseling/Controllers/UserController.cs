@@ -1,5 +1,6 @@
 ﻿using Employment_Counseling.DTOs;
 using Employment_Counseling.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Employment_Counseling.Controllers
@@ -24,6 +25,7 @@ namespace Employment_Counseling.Controllers
                 :Ok(ApiResponse<IEnumerable<UserDto>>.Ok(users));
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<ApiResponse<UserDto>>> GetUserById(Guid id)
         {
@@ -43,6 +45,7 @@ namespace Employment_Counseling.Controllers
            
         }
 
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<ActionResult> UpdateUserDetails(Guid id, [FromBody] UpdateUserDto userDetails)
         {
@@ -51,7 +54,9 @@ namespace Employment_Counseling.Controllers
                 ? Ok(ApiResponse<string>.Ok("","User updated successfully"))
                 : NotFound(ApiResponse<string>.Fail("User not found"));
         }
+        
 
+        [Authorize]
         [HttpPost("change-password")]
         public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
         {

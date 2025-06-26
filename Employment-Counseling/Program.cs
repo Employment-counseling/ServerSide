@@ -4,7 +4,10 @@ using Employment_Counseling.Repositories;
 using Employment_Counseling.Repositories.Interfaces;
 using Employment_Counseling.Services;
 using Employment_Counseling.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +29,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICostumerRepository, CostumerRepository>();
 builder.Services.AddScoped<ICostumerService, CostumerService>();
 builder.Services.AddScoped<IPayPalService, PayPalService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 
 builder.Services.AddCors(options =>
 {
@@ -37,6 +41,32 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+#region JWT
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection("JwtSettings"));
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+    var key = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+});
+#endregion
 
 
 var app = builder.Build();
@@ -55,6 +85,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowAll");
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

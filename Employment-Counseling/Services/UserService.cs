@@ -4,6 +4,7 @@ using Employment_Counseling.Entities;
 using Employment_Counseling.Repositories;
 using Employment_Counseling.Repositories.Interfaces;
 using Employment_Counseling.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
@@ -13,17 +14,20 @@ namespace Employment_Counseling.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IJwtService _jwtService;
 
-        public UserService(IUserRepository userRepository, IMapper mapper)
+        public UserService(IUserRepository userRepository, IMapper mapper, IJwtService jwtService)
         {
             _userRepository = userRepository;
             _mapper = mapper;
+            _jwtService = jwtService;
         }
         public async Task<IEnumerable<UserDto>> GetAllUsers()
         {
             var users = await _userRepository.GetAllUsers();
             return _mapper.Map<IEnumerable<UserDto>>(users);
         }
+
         public async Task<UserDto> GetUserById(Guid userId)
         {
             var user = await _userRepository.GetUserById(userId);
@@ -43,8 +47,10 @@ namespace Employment_Counseling.Services
                 Counselor c => _mapper.Map<CounselorDto>(c),
                 _ => _mapper.Map<UserDto>(user)
             };
-            return LoginResult.Ok(userDto, user.IsCostumer);
+            var token = _jwtService.GenerateToken(user);
+            return LoginResult.Ok(userDto, token, user.IsCostumer);
         }
+
         public async Task<bool> UpdateUserDetails(Guid id, UpdateUserDto dto)
         {
             var user = _userRepository.GetUserById(id).Result;

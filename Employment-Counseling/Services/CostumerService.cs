@@ -14,7 +14,8 @@ namespace Employment_Counseling.Services
         private readonly ICostumerRepository _costumerRepository;
         private readonly IMapper _mapper;
         private readonly IPayPalService _payPalService;
-
+        private readonly IJwtService _jwtService;
+        
         public CostumerService(ICostumerRepository costumerRepository, IMapper mapper, IPayPalService payPalService)
         {
             _costumerRepository = costumerRepository;
@@ -42,7 +43,9 @@ namespace Employment_Counseling.Services
             };
             await _costumerRepository.AddCostumer(costumer);
 
-            return LoginResult.Ok(_mapper.Map<CostumerDto>(costumer), true, true);
+            var token = _jwtService.GenerateToken(costumer);
+            return LoginResult.Ok(_mapper.Map<CostumerDto>(costumer),token, true, true);
+            //להוסיף שליחת מייל ללקוח
         }
     }
 }

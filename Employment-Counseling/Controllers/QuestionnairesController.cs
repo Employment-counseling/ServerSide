@@ -1,5 +1,6 @@
 ﻿using Employment_Counseling.DTOs;
 using Employment_Counseling.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Employment_Counseling.Controllers
@@ -14,8 +15,8 @@ namespace Employment_Counseling.Controllers
         {
             _questionnaireService = questionnaireService;
         }
-       
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<ApiResponse<IEnumerable<QuestionnaireDto>>>> GetQuestionnairesByPackageId(Guid id)
         {

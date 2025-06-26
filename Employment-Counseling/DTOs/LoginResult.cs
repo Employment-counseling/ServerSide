@@ -13,10 +13,11 @@ namespace Employment_Counseling.DTOs
         public string? Token { get; set; }
         public DateTime? TokenExpiration { get; set; }
         public static LoginResult Fail(string error) => new() { Success = false, ErrorMessage = error };
-        public static LoginResult Ok(Object user,bool isCostumer, bool isNewUser = false) => new() 
+        public static LoginResult Ok(Object user,string token, bool isCostumer, bool isNewUser = false) => new() 
         {
             Success = true,
             User = user ,
+            Token = token,
             IsCostumer = isCostumer,
             IsNewUser = isNewUser
         };
