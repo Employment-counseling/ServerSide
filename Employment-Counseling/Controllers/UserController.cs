@@ -67,6 +67,23 @@ namespace Employment_Counseling.Controllers
 
             return Ok(ApiResponse<string>.Ok("","Password changed successfully"));
         }
+
+        [HttpPost("refresh")]
+        public async Task<ActionResult<ApiResponse<RefreshResponseDto>>> RefreshToken([FromBody] string refreshToken)
+        {
+
+            var resulte = await _userService.RefreshToken(refreshToken);
+            if(resulte == null)
+            {
+                return NotFound(ApiResponse<RefreshResponseDto>.Fail("Token not found"));
+            }
+            if (!resulte.Success)
+            {
+                return Unauthorized(ApiResponse<RefreshResponseDto>.Fail(resulte.ErrorMessage));
+            }
+            return Ok(ApiResponse<RefreshResponseDto>.Ok(resulte));
+        }
+
     }
 }
 

@@ -15,12 +15,15 @@ namespace Employment_Counseling.Services
         private readonly IMapper _mapper;
         private readonly IPayPalService _payPalService;
         private readonly IJwtService _jwtService;
-        
-        public CostumerService(ICostumerRepository costumerRepository, IMapper mapper, IPayPalService payPalService)
+        private readonly IRefreshTokenService _refreshTokenService;
+
+        public CostumerService(ICostumerRepository costumerRepository, IMapper mapper, IPayPalService payPalService,IJwtService jwtService, IRefreshTokenService refreshTokenService)
         {
             _costumerRepository = costumerRepository;
             _mapper = mapper;
             _payPalService = payPalService;
+            _jwtService = jwtService;   
+            _refreshTokenService = refreshTokenService;
         }
 
         public async Task<LoginResult> RegisterCostumerAsync(RegisterCostumerDto dto)
@@ -44,7 +47,8 @@ namespace Employment_Counseling.Services
             await _costumerRepository.AddCostumer(costumer);
 
             var token = _jwtService.GenerateToken(costumer);
-            return LoginResult.Ok(_mapper.Map<CostumerDto>(costumer),token, true, true);
+            var refreshToken = await _refreshTokenService.GenerateRefreshToken(costumer.Id);
+            return LoginResult.Ok(_mapper.Map<CostumerDto>(costumer),token, refreshToken, true, true);
             //להוסיף שליחת מייל ללקוח
         }
     }

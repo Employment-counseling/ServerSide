@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Employment_Counseling.Controllers;
 using Employment_Counseling.DTOs;
 using Employment_Counseling.Entities;
 using Employment_Counseling.Repositories;
 using Employment_Counseling.Repositories.Interfaces;
 using Employment_Counseling.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
@@ -15,12 +17,14 @@ namespace Employment_Counseling.Services
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly IJwtService _jwtService;
+        private readonly IRefreshTokenService _refreshTokenService;
 
-        public UserService(IUserRepository userRepository, IMapper mapper, IJwtService jwtService)
+        public UserService(IUserRepository userRepository, IMapper mapper, IJwtService jwtService, IRefreshTokenService refreshTokenService)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _jwtService = jwtService;
+            _refreshTokenService = refreshTokenService;
         }
         public async Task<IEnumerable<UserDto>> GetAllUsers()
         {
@@ -48,7 +52,9 @@ namespace Employment_Counseling.Services
                 _ => _mapper.Map<UserDto>(user)
             };
             var token = _jwtService.GenerateToken(user);
-            return LoginResult.Ok(userDto, token, user.IsCostumer);
+            var refreshToken = await _refreshTokenService.GenerateRefreshToken(user.Id);
+
+            return LoginResult.Ok(userDto, token, refreshToken, user.IsCostumer);
         }
 
         public async Task<bool> UpdateUserDetails(Guid id, UpdateUserDto dto)
@@ -75,5 +81,23 @@ namespace Employment_Counseling.Services
             await _userRepository.UpdateUserDetails(user);
             return (true, null);
         }
+
+        public async Task<RefreshResponseDto> RefreshToken(string refreshToken)
+        {
+            var existingToken = await _refreshTokenService.GetByTokenAsync(refreshToken);
+            if (existingToken == null || existingToken.ExpiresAt < DateTime.UtcNow || existingToken.IsUsed)
+            {
+                return RefreshResponseDto.Fail("Invalid or expired refresh token");
+            }
+            var user = await _userRepository.GetUserById(existingToken.UserId);
+            if (user == null)
+            {
+                return RefreshResponseDto.Fail("User not found");
+            }
+            var newAccessToken = _jwtService.GenerateToken(user);
+            return RefreshResponseDto.Ok(newAccessToken, existingToken.Token);       
+
+        }
+
     }
 }
