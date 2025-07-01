@@ -30,6 +30,9 @@ builder.Services.AddScoped<ICostumerRepository, CostumerRepository>();
 builder.Services.AddScoped<ICostumerService, CostumerService>();
 builder.Services.AddScoped<IPayPalService, PayPalService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+
 
 builder.Services.AddCors(options =>
 {
